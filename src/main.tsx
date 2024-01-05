@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import ReactDOM from 'react-dom/client'
 
 import './App.scss'
@@ -50,34 +50,57 @@ const Header: React.FC = () => {
 
 
 const LayoutAdmin = () => {
-  return (
-    <div>
-      <Header />
-      <Outlet />
-    </div>
+
+  const getToken = async () => {
+    const res = await fetch("http://localhost:8000/api/v1/auth/login",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          username: "admin@gmail.com",
+          password: "123456"
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        }
+      })
+    const d = await res.json()
+    if (d.data) {
+      localStorage.setItem("access_token", d.data.access_token)
+      }
+    }
+
+    useEffect(() => {
+      getToken()
+    }, [])
+
+    return (
+      <div>
+        <Header />
+        <Outlet />
+      </div>
+    )
+  }
+
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <LayoutAdmin />,
+      children: [
+        { index: true, element: <App /> },
+        {
+          path: "/users",
+          element: <UserPage />,
+        },
+        {
+          path: "/tracks",
+          element: <div>manage tracks</div>,
+        },
+      ]
+    },
+  ]);
+
+  ReactDOM.createRoot(document.getElementById('root')!).render(
+    <React.StrictMode>
+      <RouterProvider router={router} />
+    </React.StrictMode>,
   )
-}
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <LayoutAdmin />,
-    children: [
-      { index: true, element: <App /> },
-      {
-        path: "/users",
-        element: <UserPage />,
-      },
-      {
-        path: "/tracks",
-        element: <div>manage tracks</div>,
-      },
-    ]
-  },
-]);
-
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <RouterProvider router={router} />
-  </React.StrictMode>,
-)
