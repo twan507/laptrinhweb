@@ -27,7 +27,7 @@ const InputTodo = (props: IProps) => {
     }
 
     return (
-        <div style={{border: "1px red solid"}}>
+        <div>
             <div>Add new todo</div>
             <input
                 value={todo}
