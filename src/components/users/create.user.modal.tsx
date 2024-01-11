@@ -1,5 +1,6 @@
 import { useState } from "react"
-import { Modal, Input, notification } from 'antd';
+import { Modal, Input, notification, Form, Button, Select, InputNumber } from 'antd';
+const { Option } = Select;
 
 interface IProps {
     access_token: string
@@ -10,7 +11,7 @@ interface IProps {
 
 const CreateUserModal = (props: IProps) => {
 
-    const {access_token, getData, isCreateModalOpen, setIsCreateModalOpen} = props
+    const { access_token, getData, isCreateModalOpen, setIsCreateModalOpen } = props
 
     const [name, setName] = useState("")
     const [email, setEmail] = useState("")
@@ -40,10 +41,14 @@ const CreateUserModal = (props: IProps) => {
             handleClose()
         } else {
             notification.error({
-                message:"Có lỗi xảy ra",
+                message: "Có lỗi xảy ra",
                 description: JSON.stringify(d.message)
-        })
-    }
+            })
+        }
+    };
+
+    const onFinish = (values: any) => {
+        console.log('Success:', values);
     };
 
     const handleClose = () => {
@@ -65,7 +70,95 @@ const CreateUserModal = (props: IProps) => {
             onCancel={handleClose}
             maskClosable={false}>
 
-            <div>
+            <Form
+                name="basic"
+                initialValues={{ remember: true }}
+                onFinish={onFinish}
+                autoComplete="off"
+                layout="vertical"
+            >
+                <Form.Item
+                    style={{ marginBottom: "5px" }}
+                    label="Name"
+                    name="name"
+                    rules={[{ required: true, message: 'Please input your Name!' }]}
+                >
+                    <Input placeholder="Input your Name" />
+                </Form.Item>
+
+                <Form.Item
+                    style={{ marginBottom: "5px" }}
+                    label="Email"
+                    name="email"
+                    rules={[{ required: true, message: 'Please input your Email!' }]}
+                >
+                    <Input placeholder="Input your Email" />
+                </Form.Item>
+
+                <Form.Item
+                    style={{ marginBottom: "5px" }}
+                    label="Password"
+                    name="password"
+                    rules={[{ required: true, message: 'Please input your Password!' }]}
+                >
+                    <Input.Password placeholder="Input your Password" />
+                </Form.Item>
+
+                <Form.Item
+                    style={{ marginBottom: "5px" }}
+                    label="Age"
+                    name="age"
+                    rules={[{ required: true, message: 'Please input your Age!' }]}
+                >
+                    <InputNumber placeholder="Input your Age number" style={{ width: "100%" }} />
+                </Form.Item>
+
+                <Form.Item
+                    style={{ marginBottom: "5px" }}
+                    name="gender"
+                    label="Gender"
+                    rules={[{ required: true, message: 'Please input your Role!' }]}>
+                    <Select
+                        placeholder="Select a option and change input text above"
+                        allowClear
+                    >
+                        <Option value="male">male</Option>
+                        <Option value="female">female</Option>
+                        <Option value="other">other</Option>
+                    </Select>
+                </Form.Item>
+
+                <Form.Item
+                    style={{ marginBottom: "5px" }}
+                    label="Address"
+                    name="address"
+                    rules={[{ required: true, message: 'Please input your Address!' }]}
+                >
+                    <Input placeholder="Input your Address" />
+                </Form.Item>
+
+                <Form.Item
+                    style={{ marginBottom: "5px" }}
+                    name="role"
+                    label="Role"
+                    rules={[{ required: true, message: 'Please input your Role!' }]}>
+                    <Select
+                        placeholder="Select a option and change input text above"
+                        allowClear
+                    >
+                        <Option value="user">user</Option>
+                        <Option value="admin">admin</Option>
+                    </Select>
+                </Form.Item>
+
+                <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+                    <Button type="primary" htmlType="submit">
+                        Submit
+                    </Button>
+                </Form.Item>
+            </Form>
+
+            {/* <div>
                 <label>Name:</label>
                 <Input
                     value={name}
@@ -113,7 +206,7 @@ const CreateUserModal = (props: IProps) => {
                     value={role}
                     onChange={(event) => setRole(event.target.value)}
                 />
-            </div>
+            </div> */}
         </Modal>
     )
 }
