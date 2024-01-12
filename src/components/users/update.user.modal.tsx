@@ -1,44 +1,42 @@
-import { useState,useEffect } from "react"
-import { Modal, Input, notification } from 'antd';
+import { useEffect } from "react"
+import { Modal, Input, notification, Form, InputNumber, Select } from 'antd';
 import { IUsers } from "./users.table";
+const { Option } = Select;
 
 interface IProps {
     access_token: string
     getData: any
     isUpdateModalOpen: boolean
     setIsUpdateModalOpen: (v: boolean) => void
-    dataUpdate: null| IUsers
+    dataUpdate: null | IUsers
     setDataUpdate: any
 }
 
 const UpdateUserModal = (props: IProps) => {
 
-    const {access_token, getData, isUpdateModalOpen, setIsUpdateModalOpen, dataUpdate, setDataUpdate} = props
-
-    const [name, setName] = useState("")
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
-    const [age, setAge] = useState("")
-    const [gender, setGender] = useState("")
-    const [address, setAddress] = useState("")
-    const [role, setRole] = useState("")
+    const { access_token, getData, isUpdateModalOpen, setIsUpdateModalOpen, dataUpdate, setDataUpdate } = props
 
     useEffect(() => {
         if (dataUpdate) {
-            setName(dataUpdate.name)
-            setEmail(dataUpdate.email)
-            setPassword(dataUpdate.password)
-            setGender(dataUpdate.gender)
-            setAge(dataUpdate.age)
-            setAddress(dataUpdate.address)
-            setRole(dataUpdate.role)
+            form.setFieldsValue({
+                name: dataUpdate.name,
+                email: dataUpdate.email,
+                password: dataUpdate.password,
+                age: dataUpdate.age,
+                gender: dataUpdate.gender,
+                address: dataUpdate.address,
+                role: dataUpdate.role,
+
+            })
         }
     }, [dataUpdate])
 
-    const handleOk = async () => {
-        const data = { 
-            _id: dataUpdate?._id, 
-            name, email, age, gender, address, role }
+    const onFinish = async (values: any) => {
+        const { name, email, age, gender, address, role } = values
+        const data = {
+            _id: dataUpdate?._id,
+            name, email, age, gender, address, role
+        }
         const res = await fetch("http://localhost:8000/api/v1/users",
             {
                 method: "PATCH",
@@ -57,82 +55,111 @@ const UpdateUserModal = (props: IProps) => {
             handleClose()
         } else {
             notification.error({
-                message:"Có lỗi xảy ra",
+                message: "Có lỗi xảy ra",
                 description: JSON.stringify(d.message)
-        })
-    }
+            })
+        }
     };
+
+    const [form] = Form.useForm()
 
     const handleClose = () => {
         setIsUpdateModalOpen(false)
+        form.resetFields()
         setDataUpdate(null)
-        setName("")
-        setEmail("")
-        setPassword("")
-        setGender("")
-        setAge("")
-        setAddress("")
-        setRole("")
     }
 
     return (
         <Modal
             title="Update a user"
             open={isUpdateModalOpen}
-            onOk={handleOk}
+            onOk={() => form.submit()}
             onCancel={handleClose}
             maskClosable={false}>
+            <Form
+                name="basic"
+                initialValues={{ remember: true }}
+                onFinish={onFinish}
+                layout="vertical"
+                form={form}
+            >
+                <Form.Item
+                    style={{ marginBottom: "5px" }}
+                    label="Name"
+                    name="name"
+                    rules={[{ required: true, message: 'Please input your Name!' }]}
+                >
+                    <Input placeholder="Input your Name" />
+                </Form.Item>
 
-            <div>
-                <label>Name:</label>
-                <Input
-                    value={name}
-                    onChange={(event) => setName(event.target.value)}
-                />
-            </div>
-            <div>
-                <label>Email:</label>
-                <Input
-                    value={email}
-                    onChange={(event) => setEmail(event.target.value)}
-                />
-            </div>
-            <div>
-                <label>Password:</label>
-                <Input
-                    disabled={true}
-                    value={password}
-                    onChange={(event) => setPassword(event.target.value)}
-                />
-            </div>
-            <div>
-                <label>Age:</label>
-                <Input
-                    value={age}
-                    onChange={(event) => setAge(event.target.value)}
-                />
-            </div>
-            <div>
-                <label>Gender:</label>
-                <Input
-                    value={gender}
-                    onChange={(event) => setGender(event.target.value)}
-                />
-            </div>
-            <div>
-                <label>Address:</label>
-                <Input
-                    value={address}
-                    onChange={(event) => setAddress(event.target.value)}
-                />
-            </div>
-            <div>
-                <label>Role:</label>
-                <Input
-                    value={role}
-                    onChange={(event) => setRole(event.target.value)}
-                />
-            </div>
+                <Form.Item
+                    style={{ marginBottom: "5px" }}
+                    label="Email"
+                    name="email"
+                    rules={[{ required: true, message: 'Please input your Email!' }]}
+                >
+                    <Input placeholder="Input your Email" />
+                </Form.Item>
+
+                <Form.Item
+                    style={{ marginBottom: "5px" }}
+                    label="Password"
+                    name="password"
+                    rules={[{ required: (dataUpdate ? false : true), message: 'Please input your Password!' }]}
+                >
+                    <Input.Password
+                        disabled={dataUpdate ? true : false}
+                    />
+                </Form.Item>
+
+                <Form.Item
+                    style={{ marginBottom: "5px" }}
+                    label="Age"
+                    name="age"
+                    rules={[{ required: true, message: 'Please input your Age!' }]}
+                >
+                    <InputNumber placeholder="Input your Age number" style={{ width: "100%" }} />
+                </Form.Item>
+
+                <Form.Item
+                    style={{ marginBottom: "5px" }}
+                    name="gender"
+                    label="Gender"
+                    rules={[{ required: true, message: 'Please input your Role!' }]}>
+                    <Select
+                        placeholder="Select a option and change input text above"
+                        allowClear
+                    >
+                        <Option value="male">male</Option>
+                        <Option value="female">female</Option>
+                        <Option value="other">other</Option>
+                    </Select>
+                </Form.Item>
+
+                <Form.Item
+                    style={{ marginBottom: "5px" }}
+                    label="Address"
+                    name="address"
+                    rules={[{ required: true, message: 'Please input your Address!' }]}
+                >
+                    <Input placeholder="Input your Address" />
+                </Form.Item>
+
+                <Form.Item
+                    style={{ marginBottom: "5px" }}
+                    name="role"
+                    label="Role"
+                    rules={[{ required: true, message: 'Please input your Role!' }]}>
+                    <Select
+                        placeholder="Select a option and change input text above"
+                        allowClear
+                    >
+                        <Option value="user">user</Option>
+                        <Option value="admin">admin</Option>
+                    </Select>
+                </Form.Item>
+            </Form>
+
         </Modal>
     )
 }
