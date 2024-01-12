@@ -13,15 +13,8 @@ const CreateUserModal = (props: IProps) => {
 
     const { access_token, getData, isCreateModalOpen, setIsCreateModalOpen } = props
 
-    const [name, setName] = useState("")
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
-    const [age, setAge] = useState("")
-    const [gender, setGender] = useState("")
-    const [address, setAddress] = useState("")
-    const [role, setRole] = useState("")
-
-    const handleOk = async () => {
+    const onFinish = async (values: any) => {
+        const { name, email, password, age, gender, address, role } = values
         const data = { name, email, password, age, gender, address, role }
         const res = await fetch("http://localhost:8000/api/v1/users",
             {
@@ -30,7 +23,7 @@ const CreateUserModal = (props: IProps) => {
                     "Authorization": `Bearer ${access_token}`,
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ ...data })
+                body: JSON.stringify(data)
             })
         const d = await res.json()
         if (d.data) {
@@ -47,26 +40,18 @@ const CreateUserModal = (props: IProps) => {
         }
     };
 
-    const onFinish = (values: any) => {
-        console.log('Success:', values);
-    };
+    const [form] = Form.useForm()
 
     const handleClose = () => {
+        form.resetFields()
         setIsCreateModalOpen(false)
-        setName("")
-        setEmail("")
-        setPassword("")
-        setGender("")
-        setAge("")
-        setAddress("")
-        setRole("")
     }
 
     return (
         <Modal
             title="Add new users"
             open={isCreateModalOpen}
-            onOk={handleOk}
+            onOk={() => form.submit()}
             onCancel={handleClose}
             maskClosable={false}>
 
@@ -74,8 +59,8 @@ const CreateUserModal = (props: IProps) => {
                 name="basic"
                 initialValues={{ remember: true }}
                 onFinish={onFinish}
-                autoComplete="off"
                 layout="vertical"
+                form={form}
             >
                 <Form.Item
                     style={{ marginBottom: "5px" }}
@@ -149,12 +134,6 @@ const CreateUserModal = (props: IProps) => {
                         <Option value="user">user</Option>
                         <Option value="admin">admin</Option>
                     </Select>
-                </Form.Item>
-
-                <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                    <Button type="primary" htmlType="submit">
-                        Submit
-                    </Button>
                 </Form.Item>
             </Form>
 
